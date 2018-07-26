@@ -76,8 +76,7 @@ function findNative(
   ignore: IgnoreMatcher,
   callback: Callback,
 ): void {
-  const args = [].concat(roots);
-  args.push('-L');
+  const args = ['-L'].concat(roots);
   args.push('-type', 'f');
   if (extensions.length) {
     args.push('(');
