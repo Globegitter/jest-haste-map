@@ -125,11 +125,9 @@ function findNative(roots, extensions, ignore, callback) {
       lines.forEach(path => {
         (_fs || _load_fs()).default.stat(path, (err, stat) => {
           if (!err && stat) {
-            console.log('Adding path!');  
             result.push([path, stat.mtime.getTime()]);
           }
           if (--count === 0) {
-            console.log(result);
             callback(result);
           }
         });
