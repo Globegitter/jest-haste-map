@@ -113,8 +113,6 @@ function findNative(roots, extensions, ignore, callback) {
   child.stdout.on('data', data => (stdout += data));
 
   child.stdout.on('close', () => {
-    console.log("stdout");
-    console.log(stdout);
     const lines = stdout
       .trim()
       .split('\n')
@@ -125,7 +123,6 @@ function findNative(roots, extensions, ignore, callback) {
       callback([]);
     } else {
       lines.forEach(path => {
-        console.log(path);
         (_fs || _load_fs()).default.stat(path, (err, stat) => {
           if (!err && stat) {
             console.log('Adding path!');  
