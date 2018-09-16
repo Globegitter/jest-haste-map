@@ -32,37 +32,38 @@ class HasteFS {
   }
 
   getModuleName(file) {
+    const fileMetadata = this._files.get(file);
     return (
-      (this._files[file] &&
-        this._files[file][(_constants || _load_constants()).default.ID]) ||
+      (fileMetadata &&
+        fileMetadata[(_constants || _load_constants()).default.ID]) ||
       null
     );
   }
 
   getDependencies(file) {
+    const fileMetadata = this._files.get(file);
     return (
-      (this._files[file] &&
-        this._files[file][
-          (_constants || _load_constants()).default.DEPENDENCIES
-        ]) ||
+      (fileMetadata &&
+        fileMetadata[(_constants || _load_constants()).default.DEPENDENCIES]) ||
       null
     );
   }
 
   getSha1(file) {
+    const fileMetadata = this._files.get(file);
     return (
-      (this._files[file] &&
-        this._files[file][(_constants || _load_constants()).default.SHA1]) ||
+      (fileMetadata &&
+        fileMetadata[(_constants || _load_constants()).default.SHA1]) ||
       null
     );
   }
 
   exists(file) {
-    return !!this._files[file];
+    return this._files.has(file);
   }
 
   getAllFiles() {
-    return Object.keys(this._files);
+    return Array.from(this._files.keys());
   }
 
   matchFiles(pattern) {
@@ -70,7 +71,7 @@ class HasteFS {
       pattern = new RegExp(pattern);
     }
     const files = [];
-    for (const file in this._files) {
+    for (const file of this._files.keys()) {
       if (pattern.test(file)) {
         files.push(file);
       }
@@ -80,7 +81,7 @@ class HasteFS {
 
   matchFilesWithGlob(globs, root) {
     const files = new Set();
-    for (const file in this._files) {
+    for (const file of this._files.keys()) {
       const filePath = root
         ? (_path || _load_path()).default.relative(root, file)
         : file;

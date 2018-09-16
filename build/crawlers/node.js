@@ -37,6 +37,8 @@ function _interopRequireDefault(obj) {
  *
  */
 
+const preserveSymlinks = true;
+
 function find(roots, extensions, ignore, callback) {
   const result = [];
   let activeCalls = 0;
@@ -45,7 +47,10 @@ function find(roots, extensions, ignore, callback) {
     activeCalls++;
     (_fs || _load_fs()).default.readdir(directory, (err, names) => {
       activeCalls--;
-
+      if (err) {
+        callback(result);
+        return;
+      }
       names.forEach(file => {
         file = (_path || _load_path()).default.join(directory, file);
         if (ignore(file)) {
@@ -88,7 +93,10 @@ function find(roots, extensions, ignore, callback) {
 }
 
 function findNative(roots, extensions, ignore, callback) {
-  let args = ['-L'].concat(roots);
+  const args = [].concat(roots);
+  if (preserveSymlinks) {
+    args.unshift('-L');
+  }
   args.push('-type', 'f');
   if (extensions.length) {
     args.push('(');
@@ -145,20 +153,20 @@ module.exports = function nodeCrawl(options) {
 
   return new Promise(resolve => {
     const callback = list => {
-      const files = Object.create(null);
+      const files = new Map();
       list.forEach(fileData => {
         const name = fileData[0];
         const mtime = fileData[1];
-        const existingFile = data.files[name];
+        const existingFile = data.files.get(name);
         if (
           existingFile &&
           existingFile[(_constants || _load_constants()).default.MTIME] ===
             mtime
         ) {
-          files[name] = existingFile;
+          files.set(name, existingFile);
         } else {
           // See ../constants.js; SHA-1 will always be null and fulfilled later.
-          files[name] = ['', mtime, 0, [], null];
+          files.set(name, ['', mtime, 0, [], null]);
         }
       });
       data.files = files;
